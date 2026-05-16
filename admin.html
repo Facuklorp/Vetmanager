@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetManager — Panel de Administración</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="admin-layout">
+  <!-- Admin Sidebar -->
+  <aside class="admin-sidebar">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:32px;">
+      <div style="width:36px;height:36px;background:var(--grad);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;">🐾</div>
+      <div>
+        <div style="font-weight:700;font-size:0.9rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">VetManager</div>
+        <div style="font-size:0.65rem;color:var(--txt3);">Super Admin</div>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-menu" style="padding:0;">
+        <div class="nav-item active" onclick="showSection('veterinarias')">🏥 Veterinarias</div>
+        <div class="nav-item" onclick="showSection('pendientes')">⏳ Pendientes <span class="nav-badge" id="badge-pending">0</span></div>
+        <div class="nav-item" onclick="showSection('estadisticas')">📊 Estadísticas</div>
+      </div>
+    </nav>
+    <div style="position:absolute;bottom:20px;left:16px;right:16px;">
+      <div class="user-chip">
+        <div class="user-avatar" id="admin-avatar">A</div>
+        <div>
+          <div class="user-name" id="admin-name">Admin</div>
+          <div class="user-role">Super Admin</div>
+        </div>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <!-- Admin Main -->
+  <main class="admin-main">
+
+    <!-- VETERINARIAS SECTION -->
+    <div id="section-veterinarias">
+      <div class="module-header">
+        <div>
+          <h2>🏥 Veterinarias Registradas</h2>
+          <p style="font-size:0.82rem;margin-top:4px;">Gestioná el acceso y las suscripciones de tus clientes.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Nueva Veterinaria</button>
+      </div>
+
+      <div class="admin-stat-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon">🏥</div>
+          <div class="kpi-value" id="stat-total">0</div>
+          <div class="kpi-label">Total Registradas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-value" id="stat-active">0</div>
+          <div class="kpi-label">Activas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon">🚫</div>
+          <div class="kpi-value" id="stat-suspended">0</div>
+          <div class="kpi-label">Suspendidas</div>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" class="form-control search-input" placeholder="Buscar veterinaria..." oninput="filterVets(this.value)">
+        </div>
+        <select class="form-control" style="width:auto;" onchange="filterByStatus(this.value)">
+          <option value="">Todos los estados</option>
+          <option value="active">Activas</option>
+          <option value="suspended">Suspendidas</option>
+          <option value="pending">Pendientes</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Veterinaria</th>
+              <th>Email</th>
+              <th>Teléfono</th>
+              <th>Estado</th>
+              <th>Vencimiento</th>
+              <th>Registrada</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="vets-tbody">
+            <tr><td colspan="7"><div class="loading"><div class="spinner"></div> Cargando...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PENDIENTES SECTION -->
+    <div id="section-pendientes" style="display:none;">
+      <div class="module-header">
+        <h2>⏳ Solicitudes Pendientes</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Veterinaria</th><th>Email</th><th>Teléfono</th><th>Dirección</th><th>Fecha</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="pending-tbody">
+            <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">✅</div><p>No hay solicitudes pendientes</p></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ESTADÍSTICAS SECTION -->
+    <div id="section-estadisticas" style="display:none;">
+      <div class="module-header"><h2>📊 Estadísticas Generales</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card">
+          <h4 style="margin-bottom:16px;">Distribución de Estado</h4>
+          <canvas id="chart-status" height="200"></canvas>
+        </div>
+        <div class="card">
+          <h4 style="margin-bottom:16px;">Registros por Mes</h4>
+          <canvas id="chart-monthly" height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" onclick="closeModalIfOutside(event)">
+  <div id="modal">
+    <div class="modal-header">
+      <h3 id="modal-title">Nueva Veterinaria</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer" id="modal-footer"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
