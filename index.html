@@ -3,76 +3,310 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VetManager — Ingresar</title>
-  <meta name="description" content="Sistema de gestión para veterinarias. Iniciá sesión para acceder.">
+  <title>VetManager — Sistema de Gestión Veterinaria</title>
+  <meta name="description" content="Sistema de gestión completo para veterinarias. Control de turnos, historias clínicas, inventario y facturación.">
   <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Landing Page Specific Styles */
+    body { background: var(--bg); overflow-x: hidden; }
+    .landing-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 5%; background: var(--bg2); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 1000;
+    }
+    .landing-logo { display: flex; align-items: center; gap: 8px; font-size: 1.5rem; font-weight: 700; }
+    .landing-logo-text { background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .landing-nav { display: flex; gap: 24px; align-items: center; }
+    .landing-nav a { color: var(--txt2); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .landing-nav a:hover { color: var(--primary); }
+    
+    .hero-section {
+      text-align: center; padding: 80px 20px;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg));
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-title { font-size: 3rem; font-weight: 800; margin-bottom: 16px; color: var(--txt); line-height: 1.2; }
+    .hero-subtitle { font-size: 1.2rem; color: var(--txt2); margin-bottom: 32px; max-width: 600px; margin-inline: auto; }
+    .hero-actions { display: flex; justify-content: center; gap: 16px; }
+
+    .features-section { padding: 80px 5%; max-width: 1200px; margin: 0 auto; }
+    .section-title { text-align: center; font-size: 2rem; margin-bottom: 48px; font-weight: 700; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; }
+    .feature-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; text-align: center; transition: transform 0.2s; }
+    .feature-card:hover { transform: translateY(-5px); }
+    .feature-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .feature-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+    .feature-desc { color: var(--txt3); font-size: 0.9rem; line-height: 1.5; }
+
+    .pricing-section { padding: 80px 5%; background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; max-width: 900px; margin: 0 auto; }
+    .pricing-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 32px; position: relative; }
+    .pricing-card.popular { border-color: var(--primary); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.1); }
+    .popular-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--grad); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+    .pricing-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 8px; }
+    .pricing-price { font-size: 2.5rem; font-weight: 800; margin-bottom: 24px; display: flex; align-items: baseline; gap: 4px; }
+    .pricing-price span { font-size: 1rem; color: var(--txt3); font-weight: 400; }
+    .pricing-features { list-style: none; margin-bottom: 32px; display: flex; flex-direction: column; gap: 12px; }
+    .pricing-features li { display: flex; align-items: center; gap: 8px; color: var(--txt2); font-size: 0.95rem; }
+
+    /* Modal for Auth */
+    .auth-modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 2000;
+    }
+    .auth-modal.open { display: flex; }
+    .auth-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 16px;
+      width: 100%; max-width: 400px; padding: 32px; position: relative;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .auth-close {
+      position: absolute; top: 16px; right: 16px; background: none; border: none;
+      color: var(--txt3); font-size: 1.5rem; cursor: pointer; transition: color 0.2s;
+    }
+    .auth-close:hover { color: var(--txt); }
+    .auth-tabs { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .auth-tab {
+      flex: 1; text-align: center; padding: 12px; cursor: pointer; font-weight: 600; color: var(--txt3);
+      border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .auth-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .auth-form { display: none; flex-direction: column; gap: 16px; }
+    .auth-form.active { display: flex; }
+
+    @media (max-width: 768px) {
+      .landing-nav { display: none; }
+      .hero-title { font-size: 2.2rem; }
+    }
+  </style>
 </head>
 <body>
-<div class="login-page">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon">🐾</div>
-      <div>
-        <div style="font-size:1.3rem;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">VetManager</div>
-        <div style="font-size:0.72rem;color:var(--txt3);">Sistema de Gestión Veterinaria</div>
+
+  <header class="landing-header">
+    <div class="landing-logo">
+      <span>🐾</span>
+      <span class="landing-logo-text">VetManager</span>
+    </div>
+    <nav class="landing-nav">
+      <a href="#caracteristicas">Características</a>
+      <a href="#precios">Precios</a>
+      <button class="btn btn-secondary" onclick="openAuth('login')">Ingresar</button>
+      <button class="btn btn-primary" onclick="openAuth('register')">Empezar gratis</button>
+    </nav>
+  </header>
+
+  <section class="hero-section">
+    <h1 class="hero-title">El sistema de gestión<br>que tu veterinaria necesita</h1>
+    <p class="hero-subtitle">Optimizá tu tiempo, gestioná turnos, historias clínicas e inventario desde un solo lugar. Simple, rápido y seguro.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" style="padding: 12px 24px; font-size: 1.1rem;" onclick="openAuth('register')">Comenzar ahora</button>
+      <button class="btn btn-secondary" style="padding: 12px 24px; font-size: 1.1rem;" onclick="location.href='demo.html'">Ver Demo</button>
+    </div>
+  </section>
+
+  <section id="caracteristicas" class="features-section">
+    <h2 class="section-title">Todo en un solo lugar</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3 class="feature-title">Turnos Inteligentes</h3>
+        <p class="feature-desc">Agenda y gestiona los turnos de manera eficiente, evitando superposiciones.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📋</div>
+        <h3 class="feature-title">Historias Clínicas</h3>
+        <p class="feature-desc">Registro completo de consultas, vacunas, cirugías e internaciones.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📦</div>
+        <h3 class="feature-title">Control de Inventario</h3>
+        <p class="feature-desc">Seguimiento de stock en tiempo real con alertas de bajo inventario.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <h3 class="feature-title">Ventas y Facturación</h3>
+        <p class="feature-desc">Registro de ventas de productos y servicios con reportes detallados.</p>
       </div>
     </div>
+  </section>
 
-    <!-- LOGIN FORM -->
-    <form id="form-login" onsubmit="handleLogin(event)" style="display:flex;flex-direction:column;gap:16px;">
-      <div class="form-group">
-        <label class="form-label">Email</label>
-        <input id="login-email" type="email" class="form-control" placeholder="veterinaria@ejemplo.com" required>
+  <section id="precios" class="pricing-section">
+    <h2 class="section-title">Planes simples y transparentes</h2>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <h3 class="pricing-title">Básico</h3>
+        <div class="pricing-price">$15.000 <span>/ mes</span></div>
+        <ul class="pricing-features">
+          <li>✅ Gestión de Pacientes y Dueños</li>
+          <li>✅ Agenda de Turnos</li>
+          <li>✅ Historias Clínicas</li>
+          <li>✅ Control de Inventario Básico</li>
+          <li>❌ Reportes Financieros Avanzados</li>
+          <li>❌ Múltiples Usuarios</li>
+        </ul>
+        <button class="btn btn-secondary" style="width: 100%; justify-content: center;" onclick="openAuth('register')">Empezar con Básico</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">Contraseña</label>
-        <input id="login-pass" type="password" class="form-control" placeholder="••••••••" required>
+      
+      <div class="pricing-card popular">
+        <div class="popular-badge">Más Elegido</div>
+        <h3 class="pricing-title">Pro</h3>
+        <div class="pricing-price">$40.000 <span>/ mes</span></div>
+        <ul class="pricing-features">
+          <li>✅ Todo lo del plan Básico</li>
+          <li>✅ Reportes Financieros Avanzados</li>
+          <li>✅ Usuarios Ilimitados</li>
+          <li>✅ Soporte Prioritario 24/7</li>
+          <li>✅ Módulo de Internaciones Avanzado</li>
+          <li>✅ Alertas por WhatsApp</li>
+        </ul>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="openAuth('register')">Probar Pro 14 días</button>
       </div>
-      <div id="login-error" style="display:none;" class="alert alert-danger"></div>
-      <button type="submit" id="btn-login" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;">
-        Ingresar
-      </button>
-    </form>
-    <p style="font-size:0.75rem;text-align:center;color:var(--txt3);margin-top:16px;">
-      🔒 El acceso es gestionado por el administrador del sistema.
-    </p>
+    </div>
+  </section>
+
+  <footer style="text-align: center; padding: 40px; color: var(--txt3); border-top: 1px solid var(--border);">
+    © 2026 VetManager. Todos los derechos reservados.
+  </footer>
+
+  <!-- MODAL AUTH -->
+  <div class="auth-modal" id="auth-modal">
+    <div class="auth-card">
+      <button class="auth-close" onclick="closeAuth()">×</button>
+      
+      <div class="login-logo" style="margin-bottom: 24px; text-align: center;">
+        <div class="login-logo-icon" style="margin: 0 auto 8px;">🐾</div>
+        <div style="font-size:1.5rem;font-weight:700;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">VetManager</div>
+      </div>
+
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">Ingresar</div>
+        <div class="auth-tab" id="tab-register" onclick="switchTab('register')">Registrarse</div>
+      </div>
+
+      <!-- Form Login -->
+      <form id="form-login" class="auth-form active" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input id="login-email" type="email" class="form-control" placeholder="veterinaria@ejemplo.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input id="login-pass" type="password" class="form-control" placeholder="••••••••" required>
+        </div>
+        <div id="login-error" style="display:none;" class="alert alert-danger"></div>
+        <button type="submit" id="btn-login" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:8px;">
+          Ingresar al Panel
+        </button>
+      </form>
+
+      <!-- Form Register -->
+      <form id="form-register" class="auth-form" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Nombre de la Veterinaria</label>
+          <input id="reg-name" type="text" class="form-control" placeholder="Ej: Veterinaria San Roque" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Teléfono de contacto</label>
+          <input id="reg-phone" type="tel" class="form-control" placeholder="Ej: +54 11 1234-5678" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Dirección</label>
+          <input id="reg-address" type="text" class="form-control" placeholder="Ej: Calle 123, Ciudad" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email de acceso</label>
+          <input id="reg-email" type="email" class="form-control" placeholder="contacto@veterinaria.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input id="reg-pass" type="password" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6">
+        </div>
+        <div id="reg-msg" style="display:none;" class="alert"></div>
+        <button type="submit" id="btn-register" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-top:8px;">
+          Crear mi cuenta
+        </button>
+      </form>
+    </div>
   </div>
-</div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="js/firebase.js"></script>
-<script src="js/auth.js"></script>
-<script>
-async function handleLogin(e) {
-  e.preventDefault();
-  const btn = document.getElementById('btn-login');
-  const errEl = document.getElementById('login-error');
-  btn.disabled = true; btn.textContent = 'Ingresando...';
-  errEl.style.display = 'none';
-  try {
-    await login(
-      document.getElementById('login-email').value,
-      document.getElementById('login-pass').value
-    );
-  } catch (err) {
-    errEl.textContent = getFirebaseError(err.code);
-    errEl.style.display = 'block';
-    btn.disabled = false; btn.textContent = 'Ingresar';
-  }
-}
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Modal & Tabs Logic
+    function openAuth(tab = 'login') {
+      document.getElementById('auth-modal').classList.add('open');
+      switchTab(tab);
+    }
+    function closeAuth() {
+      document.getElementById('auth-modal').classList.remove('open');
+    }
+    function switchTab(tab) {
+      document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+      document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+      document.getElementById('form-login').classList.toggle('active', tab === 'login');
+      document.getElementById('form-register').classList.toggle('active', tab === 'register');
+    }
 
-function getFirebaseError(code) {
-  const msgs = {
-    'auth/user-not-found': 'No existe una cuenta con ese email.',
-    'auth/wrong-password': 'Contraseña incorrecta.',
-    'auth/invalid-email': 'Email inválido.',
-    'auth/too-many-requests': 'Demasiados intentos. Intentá más tarde.',
-    'auth/invalid-credential': 'Email o contraseña incorrectos.',
-  };
-  return msgs[code] || 'Error al ingresar. Verificá tus datos.';
-}
-</script>
+    // Login Logic
+    async function handleLogin(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-login');
+      const errEl = document.getElementById('login-error');
+      btn.disabled = true; btn.textContent = 'Ingresando...';
+      errEl.style.display = 'none';
+      try {
+        await login(document.getElementById('login-email').value, document.getElementById('login-pass').value);
+      } catch (err) {
+        errEl.textContent = getFirebaseError(err.code);
+        errEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Ingresar al Panel';
+      }
+    }
+
+    // Register Logic
+    async function handleRegister(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btn-register');
+      const msgEl = document.getElementById('reg-msg');
+      btn.disabled = true; btn.textContent = 'Creando cuenta...';
+      msgEl.style.display = 'none';
+      
+      const email = document.getElementById('reg-email').value;
+      const pass = document.getElementById('reg-pass').value;
+      const name = document.getElementById('reg-name').value;
+      const phone = document.getElementById('reg-phone').value;
+      const address = document.getElementById('reg-address').value;
+
+      try {
+        await register(email, pass, name, phone, address);
+        msgEl.className = 'alert alert-success';
+        msgEl.innerHTML = '¡Cuenta creada! Tu solicitud está <strong>pendiente de aprobación</strong>. Te contactaremos pronto.';
+        msgEl.style.display = 'block';
+        btn.style.display = 'none';
+      } catch (err) {
+        msgEl.className = 'alert alert-danger';
+        msgEl.textContent = getFirebaseError(err.code);
+        msgEl.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Crear mi cuenta';
+      }
+    }
+
+    function getFirebaseError(code) {
+      const msgs = {
+        'auth/user-not-found': 'No existe una cuenta con ese email.',
+        'auth/wrong-password': 'Contraseña incorrecta.',
+        'auth/invalid-email': 'Email inválido.',
+        'auth/email-already-in-use': 'El email ya está registrado.',
+        'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+        'auth/too-many-requests': 'Demasiados intentos. Intentá más tarde.',
+        'auth/invalid-credential': 'Email o contraseña incorrectos.',
+      };
+      return msgs[code] || 'Ocurrió un error. Verificá los datos ingresados (' + code + ').';
+    }
+  </script>
 </body>
 </html>

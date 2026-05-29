@@ -23,10 +23,17 @@ auth.onAuthStateChanged(async (user) => {
     } else {
       if (PAGE === 'admin.html') { window.location.href = 'index.html'; return; }
       if (PAGE !== 'app.html') { window.location.href = 'app.html'; return; }
-      if (data.status === 'active') {
+      
+      let isExpired = false;
+      if (data.subscriptionEnd) {
+        const subEnd = data.subscriptionEnd.toDate ? data.subscriptionEnd.toDate() : new Date(data.subscriptionEnd);
+        if (subEnd < new Date()) isExpired = true;
+      }
+
+      if (data.status === 'active' && !isExpired) {
         if (typeof initApp === 'function') initApp();
       } else {
-        showAccessDenied(data.status);
+        showAccessDenied(isExpired ? 'expired' : data.status);
       }
     }
   } catch (e) {
@@ -60,13 +67,23 @@ async function logout() {
 
 // ---------- Pantalla de acceso denegado ----------
 function showAccessDenied(status) {
-  const msg = status === 'suspended'
-    ? '⚠️ Tu cuenta está <strong>suspendida</strong>.<br>Contactá al administrador para reactivarla.'
-    : '⏳ Tu cuenta está <strong>pendiente de activación</strong>.<br>El administrador la activará en breve.';
+  let msg = '';
+  let icon = '';
+  if (status === 'suspended') {
+    msg = '⚠️ Tu cuenta está <strong>suspendida</strong>.<br>Contactá al administrador para reactivarla.';
+    icon = '🚫';
+  } else if (status === 'expired') {
+    msg = '💳 Tu suscripción ha <strong>vencido</strong>.<br>Contactá a ventas para renovarla.';
+    icon = '💳';
+  } else {
+    msg = '⏳ Tu cuenta está <strong>pendiente de activación</strong>.<br>El administrador la activará en breve.';
+    icon = '⏳';
+  }
+
   document.body.innerHTML = `
     <div class="denied-screen">
       <div class="denied-card">
-        <div class="denied-icon">${status === 'suspended' ? '🚫' : '⏳'}</div>
+        <div class="denied-icon">${icon}</div>
         <h2>Acceso Restringido</h2>
         <p>${msg}</p>
         <button class="btn btn-primary" onclick="logout()">Cerrar sesión</button>

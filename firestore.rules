@@ -7,7 +7,8 @@ service cloud.firestore {
     }
     function isActiveVet(uid) {
       let u = get(/databases/$(database)/documents/users/$(uid)).data;
-      return u.role == 'veterinary' && u.status == 'active';
+      let hasValidSub = !('subscriptionEnd' in u) || u.subscriptionEnd == null || u.subscriptionEnd > request.time;
+      return u.role == 'veterinary' && u.status == 'active' && hasValidSub;
     }
 
     match /users/{userId} {

@@ -15,6 +15,46 @@ async function initApp() {
   document.getElementById('user-email').textContent = u.email;
   document.getElementById('user-avatar').textContent = (u.clinicName || u.email)[0].toUpperCase();
   await preloadCache();
+  
+  if (!u.onboardingDone && _cache.owners.length === 0) {
+    showOnboardingWizard();
+  } else {
+    navigateTo('dashboard');
+  }
+}
+
+// ─── ONBOARDING WIZARD ───
+function showOnboardingWizard() {
+  setModal('🎉 ¡Bienvenido a VetManager!', `
+    <div style="text-align: center; padding: 20px;">
+      <h3 style="margin-bottom: 16px;">¡Tu cuenta ya está activa!</h3>
+      <p style="color: var(--txt2); margin-bottom: 24px; line-height: 1.5;">
+        Para comenzar a usar el sistema, te sugerimos registrar a tu primer cliente (dueño) y luego a su mascota.
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px; margin: 0 auto;">
+        <button class="btn btn-primary" style="justify-content: center; padding: 12px;" onclick="startOnboarding()">
+          Comenzar configuración
+        </button>
+        <button class="btn btn-secondary" style="justify-content: center;" onclick="skipOnboarding()">
+          Omitir por ahora
+        </button>
+      </div>
+    </div>
+  `, '');
+}
+
+async function startOnboarding() {
+  await db.collection('users').doc(VID).update({ onboardingDone: true });
+  window._currentUser.onboardingDone = true;
+  closeModal();
+  navigateTo('duenos');
+  setTimeout(() => openDuenoModal(), 500);
+}
+
+async function skipOnboarding() {
+  await db.collection('users').doc(VID).update({ onboardingDone: true });
+  window._currentUser.onboardingDone = true;
+  closeModal();
   navigateTo('dashboard');
 }
 
