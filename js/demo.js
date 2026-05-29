@@ -1,4 +1,4 @@
-﻿// VETMANAGER DEMO - localStorage only
+// VETMANAGER DEMO - localStorage only
 const DEMO_KEY = 'vetmanager_demo';
 
 function getDB() {
@@ -248,7 +248,25 @@ function showToast(msg,type='info') {
 function showErr(e) { document.getElementById('content').innerHTML=`<div class="alert alert-danger">Error: ${e.message}</div>`; }
 function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
 function navigateTo(module) {
-  document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.module===module));
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    const isActive = el.dataset.module===module;
+    el.classList.toggle('active',isActive);
+  });
+  
+  // Auto-expand active submenus
+  const activeEl = document.querySelector('.nav-item.active');
+  if (activeEl) {
+    const parentSubmenu = activeEl.closest('.nav-submenu');
+    if (parentSubmenu) {
+      parentSubmenu.style.display = 'block';
+      const id = parentSubmenu.id.replace('submenu-', '');
+      const parent = document.getElementById('parent-' + id);
+      if (parent) {
+        const arrow = parent.querySelector('.submenu-arrow');
+        if (arrow) arrow.textContent = '▲';
+      }
+    }
+  }
   const titles={dashboard:'Dashboard',duenos:'Clientes / Dueños',mascotas:'Mascotas',vacunaciones:'Vacunaciones',
     consultas:'Consultas / Historia Clínica',cirugias:'Cirugías',banos:'Baños / Peluquería',
     internaciones:'Internaciones',inventario:'Inventario',compras:'Compras',ventas:'Ventas',

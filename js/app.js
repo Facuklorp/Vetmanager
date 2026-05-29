@@ -46,8 +46,24 @@ function col(name) { return db.collection('veterinaries').doc(VID).collection(na
 // â”€â”€â”€ NAVIGATION â”€â”€â”€
 function navigateTo(module) {
   document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.module === module);
+    const isActive = el.dataset.module === module;
+    el.classList.toggle('active', isActive);
   });
+
+  // Auto-expand active submenus
+  const activeEl = document.querySelector('.nav-item.active');
+  if (activeEl) {
+    const parentSubmenu = activeEl.closest('.nav-submenu');
+    if (parentSubmenu) {
+      parentSubmenu.style.display = 'block';
+      const id = parentSubmenu.id.replace('submenu-', '');
+      const parent = document.getElementById('parent-' + id);
+      if (parent) {
+        const arrow = parent.querySelector('.submenu-arrow');
+        if (arrow) arrow.textContent = 'â–²';
+      }
+    }
+  }
   const titles = {
     dashboard:'Dashboard', duenos:'Clientes / DueÃ±os', mascotas:'Mascotas',
     vacunaciones:'Vacunaciones', consultas:'Consultas / Historia ClÃ­nica',
@@ -381,11 +397,11 @@ async function renderVacunaciones() {
       return `<tr>
         <td>${fmtDate(v.date)}</td>
         <td><span class="td-main">${petName(v.petId)}</span></td>
-        <td>${v.vaccine||'—'}</td>
-        <td>${v.weight ? v.weight+' kg':'—'}</td>
-        <td>${v.dose||'—'}</td>
+        <td>${v.vaccine||'ï¿½'}</td>
+        <td>${v.weight ? v.weight+' kg':'ï¿½'}</td>
+        <td>${v.dose||'ï¿½'}</td>
         <td><span class="${isNear&&nd>=new Date()?'badge badge-yellow':''}"> ${fmtDate(v.nextDose)}</span></td>
-        <td>${v.vet||'—'}</td>
+        <td>${v.vet||'ï¿½'}</td>
         <td><div class="td-actions">
           <button class="btn btn-sm btn-secondary" onclick="openVacModal('${v.id}')">??</button>
           <button class="btn btn-sm btn-danger" onclick="deleteDoc('vacunaciones','${v.id}','renderVacunaciones')">???</button>
@@ -404,7 +420,7 @@ function openVacModal(id){
       <div class="form-group"><label class="form-label">Fecha *</label>
         <input id="v-date" type="date" class="form-control" value="${today()}"></div>
       <div class="form-group"><label class="form-label">Vacuna *</label>
-        <input id="v-vaccine" class="form-control" placeholder="Ej: Antirrábica, Séxtuple..."></div>
+        <input id="v-vaccine" class="form-control" placeholder="Ej: Antirrï¿½bica, Sï¿½xtuple..."></div>
       <div class="form-group"><label class="form-label">Dosis</label>
         <input id="v-dose" class="form-control" placeholder="Ej: 1ml, Refuerzo..."></div>
       <div class="form-group"><label class="form-label">Peso actual (kg)</label>
@@ -450,15 +466,15 @@ async function renderConsultas(){
     const rows=data.map(c=>`<tr>
       <td>${fmtDate(c.date)}</td>
       <td><span class="td-main">${petName(c.petId)}</span></td>
-      <td>${c.symptoms||'—'}</td>
-      <td>${c.diagnosis||'—'}</td>
-      <td>${c.treatment||'—'}</td>
-      <td>${c.vet||'—'}</td>
+      <td>${c.symptoms||'ï¿½'}</td>
+      <td>${c.diagnosis||'ï¿½'}</td>
+      <td>${c.treatment||'ï¿½'}</td>
+      <td>${c.vet||'ï¿½'}</td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-secondary" onclick="openConsultaModal('${c.id}')">??</button>
         <button class="btn btn-sm btn-danger" onclick="deleteDoc('consultas','${c.id}','renderConsultas')">???</button>
       </div></td></tr>`);
-    document.getElementById('content').innerHTML=buildTable(['Fecha','Mascota','Síntomas','Diagnóstico','Tratamiento','Veterinario','Acciones'],rows,'No hay consultas registradas.');
+    document.getElementById('content').innerHTML=buildTable(['Fecha','Mascota','Sï¿½ntomas','Diagnï¿½stico','Tratamiento','Veterinario','Acciones'],rows,'No hay consultas registradas.');
   }catch(e){showErr(e);}
 }
 
@@ -471,11 +487,11 @@ function openConsultaModal(id){
         <input id="c-date" type="date" class="form-control" value="${today()}"></div>
       <div class="form-group"><label class="form-label">Peso (kg)</label>
         <input id="c-weight" type="number" step="0.1" class="form-control"></div>
-      <div class="form-group"><label class="form-label">Temperatura (°C)</label>
+      <div class="form-group"><label class="form-label">Temperatura (ï¿½C)</label>
         <input id="c-temp" type="number" step="0.1" class="form-control"></div>
-      <div class="form-group form-full"><label class="form-label">Síntomas</label>
-        <textarea id="c-symptoms" class="form-control" placeholder="Describe los síntomas..."></textarea></div>
-      <div class="form-group form-full"><label class="form-label">Diagnóstico</label>
+      <div class="form-group form-full"><label class="form-label">Sï¿½ntomas</label>
+        <textarea id="c-symptoms" class="form-control" placeholder="Describe los sï¿½ntomas..."></textarea></div>
+      <div class="form-group form-full"><label class="form-label">Diagnï¿½stico</label>
         <textarea id="c-diagnosis" class="form-control"></textarea></div>
       <div class="form-group form-full"><label class="form-label">Tratamiento</label>
         <textarea id="c-treatment" class="form-control"></textarea></div>
@@ -523,11 +539,11 @@ async function renderCirugias(){
     const rows=data.map(c=>`<tr>
       <td>${fmtDate(c.date)}</td>
       <td><span class="td-main">${petName(c.petId)}</span></td>
-      <td>${c.type||'—'}</td>
-      <td>${c.vet||'—'}</td>
-      <td>${c.anesthesia||'—'}</td>
-      <td>${c.preWeight?c.preWeight+' kg':'—'}</td>
-      <td><span class="badge ${c.result==='exitosa'?'badge-green':c.result==='complicaciones'?'badge-yellow':'badge-red'}">${c.result||'—'}</span></td>
+      <td>${c.type||'ï¿½'}</td>
+      <td>${c.vet||'ï¿½'}</td>
+      <td>${c.anesthesia||'ï¿½'}</td>
+      <td>${c.preWeight?c.preWeight+' kg':'ï¿½'}</td>
+      <td><span class="badge ${c.result==='exitosa'?'badge-green':c.result==='complicaciones'?'badge-yellow':'badge-red'}">${c.result||'ï¿½'}</span></td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-secondary" onclick="openCirugiaModal('${c.id}')">??</button>
         <button class="btn btn-sm btn-danger" onclick="deleteDoc('cirugias','${c.id}','renderCirugias')">???</button>
@@ -599,8 +615,8 @@ async function renderBanos(){
     const rows=data.map(b=>`<tr>
       <td>${fmtDate(b.date)}</td>
       <td><span class="td-main">${petName(b.petId)}</span></td>
-      <td>${b.service||'—'}</td>
-      <td>${b.notes||'—'}</td>
+      <td>${b.service||'ï¿½'}</td>
+      <td>${b.notes||'ï¿½'}</td>
       <td><strong>${fmtMoney(b.price)}</strong></td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-secondary" onclick="openBanoModal('${b.id}')">??</button>
@@ -663,8 +679,8 @@ async function renderInternaciones(){
     const activeRows=active.map(i=>`<tr style="background:rgba(239,68,68,0.05)">
       <td><span class="td-main">${petName(i.petId)}</span></td>
       <td>${fmtDate(i.admissionDate)}</td>
-      <td>${i.reason||'—'}</td>
-      <td>${i.evolution||'—'}</td>
+      <td>${i.reason||'ï¿½'}</td>
+      <td>${i.evolution||'ï¿½'}</td>
       <td><span class="badge badge-red">Internado</span></td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-success" onclick="darAlta('${i.id}')">Alta</button>
@@ -673,8 +689,8 @@ async function renderInternaciones(){
     const histRows=hist.map(i=>`<tr>
       <td><span class="td-main">${petName(i.petId)}</span></td>
       <td>${fmtDate(i.admissionDate)}</td>
-      <td>${i.reason||'—'}</td>
-      <td>${i.evolution||'—'}</td>
+      <td>${i.reason||'ï¿½'}</td>
+      <td>${i.evolution||'ï¿½'}</td>
       <td>${fmtDate(i.dischargeDate)}</td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-danger" onclick="deleteDoc('internaciones','${i.id}','renderInternaciones')">???</button>
@@ -754,7 +770,7 @@ async function renderInventario(){
         <td>${p.minStock||0}</td>
         <td>${fmtMoney(p.costPrice)}</td>
         <td>${fmtMoney(p.salePrice)}</td>
-        <td>${p.supplier||'—'}</td>
+        <td>${p.supplier||'ï¿½'}</td>
         <td><div class="td-actions">
           <button class="btn btn-sm btn-secondary" onclick="openProductoModal('${p.id}')">??</button>
           <button class="btn btn-sm btn-danger" onclick="deleteDoc('products','${p.id}','renderInventario')">???</button>
@@ -824,10 +840,10 @@ async function renderCompras(){
     const data=snap.docs.map(d=>({id:d.id,...d.data()}));
     const rows=data.map(c=>`<tr>
       <td>${fmtDate(c.date)}</td>
-      <td><span class="td-main">${c.supplier||'—'}</span></td>
+      <td><span class="td-main">${c.supplier||'ï¿½'}</span></td>
       <td>${(c.items||[]).length} producto(s)</td>
       <td><strong>${fmtMoney(c.total)}</strong></td>
-      <td>${c.notes||'—'}</td>
+      <td>${c.notes||'ï¿½'}</td>
       <td><button class="btn btn-sm btn-danger" onclick="deleteDoc('compras','${c.id}','renderCompras')">???</button></td></tr>`);
     document.getElementById('content').innerHTML=buildTable(['Fecha','Proveedor','Items','Total','Notas','Acciones'],rows,'No hay compras registradas.');
   }catch(e){showErr(e);}
@@ -928,7 +944,7 @@ async function renderVentas(){
     const data=snap.docs.map(d=>({id:d.id,...d.data()}));
     const rows=data.map(v=>`<tr>
       <td>${fmtDate(v.date)}</td>
-      <td>${ownerName(v.clientId)||v.clientName||'—'}</td>
+      <td>${ownerName(v.clientId)||v.clientName||'ï¿½'}</td>
       <td>${(v.items||[]).length} item(s)</td>
       <td><strong>${fmtMoney(v.total)}</strong></td>
       <td><span class="badge badge-blue">${v.paymentMethod||'Efectivo'}</span></td>
@@ -1049,11 +1065,11 @@ async function renderTurnos(){
     const past=data.filter(t=>t.date<today());
 
     const renderRows=(items)=>items.map(t=>`<tr>
-      <td><strong>${t.date||'—'}</strong></td>
-      <td><strong>${t.time||'—'}</strong></td>
+      <td><strong>${t.date||'ï¿½'}</strong></td>
+      <td><strong>${t.time||'ï¿½'}</strong></td>
       <td><span class="td-main">${petName(t.petId)}</span></td>
       <td>${ownerName(_cache.pets.find(p=>p.id===t.petId)?.ownerId)}</td>
-      <td>${t.reason||'—'}</td>
+      <td>${t.reason||'ï¿½'}</td>
       <td>${statusBadge(t.status,'turno')}</td>
       <td><div class="td-actions">
         ${t.status==='pending'?`
@@ -1065,11 +1081,11 @@ async function renderTurnos(){
 
     document.getElementById('content').innerHTML=`
       <h4 style="margin-bottom:12px;">?? Hoy (${today()})</h4>
-      ${buildTable(['Fecha','Hora','Mascota','Dueño','Motivo','Estado','Acciones'],renderRows(todayData),'No hay turnos para hoy.')}
+      ${buildTable(['Fecha','Hora','Mascota','Dueï¿½o','Motivo','Estado','Acciones'],renderRows(todayData),'No hay turnos para hoy.')}
       <h4 style="margin:20px 0 12px;">?? Proximos turnos</h4>
-      ${buildTable(['Fecha','Hora','Mascota','Dueño','Motivo','Estado','Acciones'],renderRows(upcoming.slice(0,10)),'No hay turnos proximos.')}
+      ${buildTable(['Fecha','Hora','Mascota','Dueï¿½o','Motivo','Estado','Acciones'],renderRows(upcoming.slice(0,10)),'No hay turnos proximos.')}
       <h4 style="margin:20px 0 12px;">?? Historial</h4>
-      ${buildTable(['Fecha','Hora','Mascota','Dueño','Motivo','Estado','Acciones'],renderRows(past.slice(0,10)),'Sin historial.')}`;
+      ${buildTable(['Fecha','Hora','Mascota','Dueï¿½o','Motivo','Estado','Acciones'],renderRows(past.slice(0,10)),'Sin historial.')}`;
   }catch(e){showErr(e);}
 }
 

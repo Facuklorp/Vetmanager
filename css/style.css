@@ -136,6 +136,41 @@ a:hover { text-decoration: underline; }
   border-radius: 99px;
 }
 
+/* Submenús Colapsables */
+.nav-parent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+}
+.submenu-arrow {
+  margin-left: auto;
+  font-size: 0.65rem;
+  color: var(--txt3);
+  transition: transform var(--t);
+}
+.nav-parent:hover .submenu-arrow {
+  color: var(--txt);
+}
+.nav-submenu {
+  list-style: none;
+  padding-left: 12px;
+  margin-left: 16px;
+  border-left: 1px dashed var(--border);
+  margin-bottom: 8px;
+  transition: max-height var(--t);
+}
+.nav-submenu .nav-item {
+  padding: 8px 12px;
+  font-size: 0.825rem;
+  margin-bottom: 1px;
+}
+.nav-section-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 12px 12px;
+}
+
 .sidebar-footer {
   border-top: 1px solid var(--border);
   padding: 16px;
@@ -201,15 +236,45 @@ a:hover { text-decoration: underline; }
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
-  padding: 20px;
-  display: flex; flex-direction: column; gap: 8px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  row-gap: 2px;
+  align-items: center;
   transition: all var(--t);
   cursor: default;
 }
 .kpi-card:hover { border-color: var(--border-h); transform: translateY(-2px); box-shadow: var(--shadow); }
-.kpi-icon { font-size: 1.5rem; }
-.kpi-value { font-size: 2rem; font-weight: 700; }
-.kpi-label { font-size: 0.8rem; color: var(--txt3); font-weight: 500; }
+.kpi-icon {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+  font-size: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-md);
+  background: var(--grad-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-value {
+  grid-row: 1;
+  grid-column: 2;
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.kpi-label {
+  grid-row: 2;
+  grid-column: 2;
+  font-size: 0.75rem;
+  color: var(--txt2);
+  font-weight: 500;
+  line-height: 1.2;
+}
 .kpi-trend { font-size: 0.75rem; color: var(--green); }
 
 /* ── BUTTONS ── */
