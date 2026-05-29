@@ -69,7 +69,6 @@ a:hover { text-decoration: underline; }
 /* ── SIDEBAR ── */
 #sidebar {
   width: var(--sidebar);
-  min-height: 100vh;
   background: var(--bg2);
   border-right: 1px solid var(--border);
   display: flex;
@@ -77,6 +76,7 @@ a:hover { text-decoration: underline; }
   position: fixed;
   left: 0; top: 0; bottom: 0;
   z-index: 100;
+  overflow: hidden;
   transition: transform var(--t);
 }
 .sidebar-brand {
@@ -105,7 +105,7 @@ a:hover { text-decoration: underline; }
   color: var(--txt3);
   padding: 16px 20px 6px;
 }
-.nav-menu { list-style: none; padding: 8px 12px; flex: 1; overflow-y: auto; }
+.nav-menu { list-style: none; padding: 8px 12px; flex: 1; overflow-y: auto; min-height: 0; }
 .nav-item {
   display: flex;
   align-items: center;
