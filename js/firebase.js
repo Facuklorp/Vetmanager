@@ -14,7 +14,7 @@ const firebaseConfig = {
 };
 
 // ⚠️ IMPORTANTE: Cambiá este email por el tuyo (será el super-admin)
-const ADMIN_EMAIL = "facuklorp@gmail.com";
+const ADMIN_EMAIL = "facundostrano13@gmail.com";
 
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
